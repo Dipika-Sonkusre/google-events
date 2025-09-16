@@ -39,11 +39,18 @@ export default function AddEvent() {
 
   useEffect(() => {
     if (state) {
+      const formatTime = (timeStr: string) => {
+        const time = new Date(`1970-01-01T${timeStr}`);
+        const hours = time.getHours().toString().padStart(2, "0");
+        const minutes = time.getMinutes().toString().padStart(2, "0");
+        return `${hours}:${minutes}`;
+      };
+
       setForm({
         title: state.title,
         date: state.date,
-        startTime: state.startTime,
-        endTime: state.endTime,
+        startTime: formatTime(state.startTime),
+        endTime: formatTime(state.endTime),
         description: state.description,
         status: state.status ?? "Upcoming",
       });
@@ -197,7 +204,7 @@ export default function AddEvent() {
                 InputLabelProps={{ shrink: true }}
               />
               <TextField
-                label="Time"
+                label="Start Time"
                 type="time"
                 value={form.startTime}
                 onChange={handleChange("startTime")}
@@ -206,7 +213,7 @@ export default function AddEvent() {
                 InputLabelProps={{ shrink: true }}
               />
               <TextField
-                label="Time"
+                label="End Time"
                 type="time"
                 value={form.endTime}
                 onChange={handleChange("endTime")}
