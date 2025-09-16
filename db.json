@@ -1,43 +1,39 @@
 {
   "events": [
     {
-      "id": "2",
-      "title": "Product Launch",
-      "date": "2025-09-20",
-      "time": "14:30",
-      "description": "Launch event for the new product line.",
-      "status": "Upcoming"
-    },
-    {
-      "id": "1757754834787",
-      "title": "BBBBBB",
-      "date": "2025-09-13",
-      "time": "14:49",
-      "description": "BBBBBBBBBBBBBb",
-      "status": "Completed"
-    },
-    {
-      "id": "1757911972489",
-      "title": "AAAAAA",
+      "id": "1757919029027",
+      "title": "React Imp Topics",
       "date": "2025-09-15",
-      "time": "10:28",
-      "description": "csdcsdc",
+      "startTime": "12:26",
+      "endTime": "12:33",
+      "description": "Learning React Imp Topics",
       "status": "Completed"
     },
     {
-      "id": "1757913084874",
-      "title": "ABC",
-      "date": "2025-09-15",
-      "time": "10:48",
-      "description": "AABBCCC",
-      "status": "Completed"
-    },
-    {
-      "id": "1757917305728",
-      "title": "Testing ",
+      "id": "1757997087415",
+      "title": "Dipika's Practice Projects",
       "date": "2025-09-16",
-      "time": "11:53",
-      "description": "Task will complete Tomorrow",
+      "startTime": "10:07",
+      "endTime": "10:14",
+      "description": "Practice Projects",
+      "status": "Completed"
+    },
+    {
+      "id": "1757997220769",
+      "title": "Testing Practice Projects",
+      "date": "2025-09-16",
+      "startTime": "10:09",
+      "endTime": "10:16",
+      "description": "Testing Practice Projects",
+      "status": "Completed"
+    },
+    {
+      "id": "1757998169242",
+      "title": "MeshId Work",
+      "date": "2025-09-16",
+      "startTime": "13:00",
+      "endTime": "18:00",
+      "description": "MeshID Form Changes",
       "status": "Upcoming"
     }
   ]

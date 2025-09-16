@@ -2,34 +2,32 @@ import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
 import {
   Box,
   Button,
-  List,
-  ListItem,
-  ListItemText,
   Paper,
   Stack,
   TextField,
   Typography,
 } from "@mui/material";
-import { useAppDispatch, useAppSelector } from "../redux/hooks";
-import { addEvent, fetchEvents, updateEvent } from "../redux/eventThunk";
+import { useAppDispatch } from "../redux/hooks";
+import { addEvent, fetchEvents } from "../redux/eventThunk";
 import type { Event } from "../interface";
 import { toast } from "react-toastify";
 
 type FormState = {
   title: string;
   date: string;
-  time: string;
+  startTime: string;
+  endTime: string;
   description: string;
 };
 
 export default function AddEvent() {
-  const { events } = useAppSelector((state) => state.event);
   const dispatch = useAppDispatch();
 
   const [form, setForm] = useState<FormState>({
     title: "",
     date: "",
-    time: "",
+    startTime: "",
+    endTime: "",
     description: "",
   });
 
@@ -49,35 +47,71 @@ export default function AddEvent() {
       id: Date.now().toString(),
       title: form.title,
       date: form.date,
-      time: form.time,
+      startTime: form.startTime,
+      endTime: form.endTime,
       description: form.description,
       status: "Upcoming",
     };
 
     dispatch(addEvent(newFormEvent));
 
+    // Schedule reminder for 5 minutes before event
     const [year, month, day] = form.date.split("-");
-    const [hour, minute] = form.time.split(":");
+    const [startHour, startMinute] = form.startTime.split(":");
 
     // format event reminder date
-    const eventDateTime = new Date(
+    const eventDateTimeS = new Date(
       Number(year),
       Number(month) - 1,
       Number(day),
-      Number(hour),
-      Number(minute),
+      Number(startHour),
+      Number(startMinute),
       0
     );
 
-    if (!isNaN(eventDateTime.getTime())) {
-      const remindTime = new Date(eventDateTime.getTime() - 5 * 60 * 1000);
+    if (!isNaN(eventDateTimeS.getTime())) {
+      const remindBeforeStart = new Date(
+        eventDateTimeS.getTime() - 5 * 60 * 1000
+      );
       const now = new Date();
-      const delay = remindTime.getTime() - now.getTime();
+      const delayBeforeStart = remindBeforeStart.getTime() - now.getTime();
 
-      if (delay > 0) {
+      if (delayBeforeStart > 0) {
         setTimeout(() => {
+          console.log("5 minutes before your event");
           toast.success("5 minutes before your event");
-        }, delay);
+        }, delayBeforeStart);
+      } else {
+        toast.info("Cannot set reminder for events that have already passed");
+      }
+    } else {
+      toast.error("Invalid date or time");
+    }
+
+    // 5 minute left for an event
+    const [endHour, endMinute] = form.endTime.split(":");
+    // format event reminder date
+    const eventDateTimeE = new Date(
+      Number(year),
+      Number(month) - 1,
+      Number(day),
+      Number(endHour),
+      Number(endMinute),
+      0
+    );
+
+    if (!isNaN(eventDateTimeE.getTime())) {
+      const remindBeforeEnd = new Date(
+        eventDateTimeE.getTime() - 5 * 60 * 1000
+      );
+      const now = new Date();
+      const delayBeforeEnd = remindBeforeEnd.getTime() - now.getTime();
+
+      if (delayBeforeEnd > 0) {
+        setTimeout(() => {
+          console.log(`5 minutes left for your ${form.title} event`);
+          toast.success(`5 minutes left for your ${form.title} event`);
+        }, delayBeforeEnd);
       } else {
         toast.info("Cannot set reminder for events that have already passed");
       }
@@ -86,39 +120,14 @@ export default function AddEvent() {
     }
 
     // Reset form AFTER scheduling
-    setForm({ title: "", date: "", time: "", description: "" });
+    setForm({
+      title: "",
+      date: "",
+      startTime: "",
+      endTime: "",
+      description: "",
+    });
   };
-
-  // Update event status
-  const updateStatus = (event: Event) => {
-    const newStatus = event.status === "Completed" ? "Upcoming" : "Completed";
-
-    const updatedEvent: Event = { ...event, status: newStatus };
-
-    dispatch(updateEvent(updatedEvent));
-  };
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const now = new Date();
-
-      events.forEach((event) => {
-        const eventDateTime = new Date(`${event.date}T${event.time}:00`);
-        if (
-          event.status !== "Completed" &&
-          eventDateTime.getTime() <= now.getTime()
-        ) {
-          const updatedEvent: Event = {
-            ...event,
-            status: "Completed",
-          };
-          dispatch(updateEvent(updatedEvent));
-        }
-      });
-    }, 60000);
-
-    return () => clearInterval(interval);
-  }, [events, dispatch]);
 
   return (
     <>
@@ -150,8 +159,17 @@ export default function AddEvent() {
               <TextField
                 label="Time"
                 type="time"
-                value={form.time}
-                onChange={handleChange("time")}
+                value={form.startTime}
+                onChange={handleChange("startTime")}
+                required
+                fullWidth
+                InputLabelProps={{ shrink: true }}
+              />
+              <TextField
+                label="Time"
+                type="time"
+                value={form.endTime}
+                onChange={handleChange("endTime")}
                 required
                 fullWidth
                 InputLabelProps={{ shrink: true }}
@@ -178,7 +196,13 @@ export default function AddEvent() {
                 type="button"
                 variant="outlined"
                 onClick={() =>
-                  setForm({ title: "", date: "", time: "", description: "" })
+                  setForm({
+                    title: "",
+                    date: "",
+                    startTime: "",
+                    endTime: "",
+                    description: "",
+                  })
                 }
               >
                 Reset
@@ -190,78 +214,6 @@ export default function AddEvent() {
           </Stack>
         </Box>
       </Paper>
-      <br />
-
-      <Box sx={{ padding: 4, maxWidth: 600, margin: "0 auto" }}>
-        <Typography variant="h4" gutterBottom>
-          Calendar Events
-        </Typography>
-        <Paper elevation={2} sx={{ p: 2, maxWidth: 600 }}>
-          <List>
-            {(events || []).length === 0 ? (
-              <Typography variant="body1">No events found.</Typography>
-            ) : (
-              events.map((event: Event) => (
-                <ListItem
-                  key={event.id}
-                  sx={{
-                    mb: 2,
-                    borderBottom: "1px solid #eee",
-                    backgroundColor:
-                      event.status === "Completed" ? "#f2f2f2" : "white",
-                  }}
-                >
-                  <ListItemText
-                    primary={event.title}
-                    secondary={
-                      <Box
-                        component="div"
-                        sx={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                          gap: 2,
-                        }}
-                      >
-                        <Box>
-                          <Typography
-                            variant="body2"
-                            color="text.secondary"
-                            component="span"
-                          >
-                            {event.date} at {event.time}
-                          </Typography>
-                          <br />
-                          <Typography variant="body2" component="span">
-                            {event.description}
-                          </Typography>
-                        </Box>
-                        <Box>
-                          <Button
-                            size="small"
-                            className="button"
-                            sx={{
-                              backgroundColor:
-                                event.status === "Completed"
-                                  ? "green"
-                                  : "orange",
-                              pointerEvents:
-                                event.status === "Completed" ? "none" : "auto",
-                            }}
-                            onClick={() => updateStatus(event)}
-                          >
-                            {event.status}
-                          </Button>
-                        </Box>
-                      </Box>
-                    }
-                  />
-                </ListItem>
-              ))
-            )}
-          </List>
-        </Paper>
-      </Box>
     </>
   );
 }

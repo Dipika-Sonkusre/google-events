@@ -1,46 +1,36 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import type { Event } from "../interface";
+import { eventApi } from "../api/eventApi";
+
+const APP_URL = "http://localhost:3000/events";
 
 export const fetchEvents = createAsyncThunk<Event[]>(
   "events/fetchEvents",
   async () => {
-    const response = await fetch("http://localhost:3000/events");
-    const data = await response.json();
-    return data;
+    return eventApi({
+      url: APP_URL,
+    });
   }
 );
 
-export const addEvent = createAsyncThunk(
+export const addEvent = createAsyncThunk<Event, Event>(
   "events/addEvent",
-  async (event: Event) => {
-    const response = await fetch("http://localhost:3000/events", {
+  async (event) => {
+    return await eventApi({
+      url: APP_URL,
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(event),
+      body: event,
     });
-    const data = await response.json();
-    return data;
   }
 );
 
-export const updateEvent = createAsyncThunk(
+export const updateEvent = createAsyncThunk<Event, Event>(
   "events/updateEvent",
-  async (event: Event) => {
-    const response = await fetch(`http://localhost:3000/events/${event.id}`, {
+  async (event) => {
+    return eventApi({
+      url: `${APP_URL}${event.id}`,
       method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(event),
+      body: event,
     });
-
-     if (!response.ok) {
-       throw new Error("Failed to update event");
-     }
-
-    const data = await response.json();
-    return data;
   }
 );
