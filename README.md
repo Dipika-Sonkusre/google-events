@@ -1,69 +1,30 @@
 # React + TypeScript + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Google Tasks Dashboard
 
-Currently, two official plugins are available:
+A simple dashboard that mimics Google Tasks with the ability to manage events. Users can add events with specific date and time, receive toast notifications, and update or delete events as needed.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+<b>Features</b><br>
+<ul>
+  <li>Add events with time and date.</li>
+  <li>Toast notifications 5 minutes before and 5 minutes remaining for an event.</li>
+  <li>Update event status (e.g., completed, pending).</li>
+  <li>Edit events and delete events.</li>
+  <li>Simple and user-friendly interface for managing tasks and events.</li>
+</ul>
 
-## Expanding the ESLint configuration
+<b>Tech Stack</b><br>
+<ul>
+  <li>Frontend: React</li>
+  <li>Toast Notifications: React-Toastify</li>
+  <li>State Management: Redux Toolkit</li>
+</ul>
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+<b>Setup Instructions</b><br>
+1. Clone this repository:
+   git clone https://github.com/your-username/google-tasks-dashboard.git
+2. Install dependencies:
+   cd google-tasks-dashboard
+   npm install
+3. Run the app:
+   npm start
