@@ -1,3 +1,10 @@
+import { useEffect } from "react";
+
+import { useAppDispatch, useAppSelector } from "../redux/hooks";
+import { deleteEvent, fetchEvents, updateEvent } from "../redux/eventThunk";
+
+import type { Event, EventStatus } from "../interface";
+
 import {
   Accordion,
   AccordionSummary,
@@ -9,12 +16,12 @@ import {
   Button,
   Box,
   Paper,
+  IconButton,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { useAppDispatch, useAppSelector } from "../redux/hooks";
-import { useEffect } from "react";
-import { fetchEvents, updateEvent } from "../redux/eventThunk";
-import type { Event, EventStatus } from "../interface";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { Link } from "react-router";
 
 export default function Calendar() {
   const { events } = useAppSelector((state) => state.event);
@@ -69,6 +76,13 @@ export default function Calendar() {
   const groupedEvents: Record<EventStatus, Event[]> = {
     Upcoming: events.filter((event) => event.status === "Upcoming"),
     Completed: events.filter((event) => event.status === "Completed"),
+  };
+
+  const onDelete = (id: string) => {
+    if (window.confirm("Are you sure you want to delete this event?")) {
+      dispatch(deleteEvent(id));
+      dispatch(fetchEvents());
+    }
   };
 
   return (
@@ -126,7 +140,47 @@ export default function Calendar() {
                                 {event.description}
                               </Typography>
                             </Box>
-                            <Box>
+                            {/* <Box>
+                              <Button
+                                size="small"
+                                sx={{
+                                  backgroundColor:
+                                    event.status === "Completed"
+                                      ? "green"
+                                      : "orange",
+                                  color: "white",
+                                  pointerEvents:
+                                    event.status === "Completed"
+                                      ? "none"
+                                      : "auto",
+                                }}
+                                onClick={() => updateStatus(event)}
+                              >
+                                {event.status}
+                              </Button>
+                            </Box> */}
+
+                            <Box
+                              sx={{
+                                display: "flex",
+                                gap: 1,
+                                alignItems: "center",
+                              }}
+                            >
+                              <Link to="/" state={event}>
+                                <IconButton size="small" aria-label="edit">
+                                  <EditIcon fontSize="small" />
+                                </IconButton>
+                              </Link>
+
+                              <IconButton
+                                size="small"
+                                onClick={() => onDelete(event.id)}
+                                aria-label="delete"
+                              >
+                                <DeleteIcon fontSize="small" />
+                              </IconButton>
+
                               <Button
                                 size="small"
                                 sx={{
