@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { addEvent, fetchEvents, updateEvent } from "./eventThunk";
+import { addEvent, deleteEvent, fetchEvents, updateEvent } from "./eventThunk";
 import type { EventsState } from "../interface";
 import { toast } from "react-toastify";
 
@@ -21,15 +21,20 @@ const eventsSlice = createSlice({
         toast.success("Event added successfully!");
       })
       .addCase(updateEvent.fulfilled, (state, action) => {
-        state.events = state.events.map((event) =>
-          event.id === action.payload.id
-            ? {
-                ...event,
-                ...action.payload,
-              }
-            : event
+        const index = state.events.findIndex(
+          (event) => event.id === action.payload.id
         );
+
+        if (index !== -1) {
+          state.events[index] = action.payload;
+        }
         toast.success("Event updated successfully!");
+      })
+      .addCase(deleteEvent.fulfilled, (state, action) => {
+        state.events = state.events.filter(
+          (event) => event.id !== action.payload
+        );
+        toast.success("Event deleted successfully!");
       });
   },
 });

@@ -7,7 +7,7 @@ const APP_URL = "http://localhost:3000/events";
 export const fetchEvents = createAsyncThunk<Event[]>(
   "events/fetchEvents",
   async () => {
-    return eventApi({
+    return await eventApi({
       url: APP_URL,
     });
   }
@@ -27,10 +27,20 @@ export const addEvent = createAsyncThunk<Event, Event>(
 export const updateEvent = createAsyncThunk<Event, Event>(
   "events/updateEvent",
   async (event) => {
-    return eventApi({
-      url: `${APP_URL}${event.id}`,
+    return await eventApi({
+      url: `${APP_URL}/${event.id}`,
       method: "PUT",
       body: event,
+    });
+  }
+);
+
+export const deleteEvent = createAsyncThunk<string, string>(
+  "events/deleteEvent",
+  async (id) => {
+    return await eventApi({
+      url: `${APP_URL}/${id}`,
+      method: "DELETE",
     });
   }
 );

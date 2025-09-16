@@ -1,4 +1,9 @@
 import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
+
+import { useAppDispatch } from "../redux/hooks";
+import { addEvent, updateEvent } from "../redux/eventThunk";
+import type { Event, EventStatus } from "../interface";
+
 import {
   Box,
   Button,
@@ -7,9 +12,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { useAppDispatch } from "../redux/hooks";
-import { addEvent, fetchEvents } from "../redux/eventThunk";
-import type { Event } from "../interface";
+import { useLocation } from "react-router";
 import { toast } from "react-toastify";
 
 type FormState = {
@@ -18,10 +21,12 @@ type FormState = {
   startTime: string;
   endTime: string;
   description: string;
+  status: EventStatus;
 };
 
 export default function AddEvent() {
   const dispatch = useAppDispatch();
+  const { state } = useLocation();
 
   const [form, setForm] = useState<FormState>({
     title: "",
@@ -29,11 +34,30 @@ export default function AddEvent() {
     startTime: "",
     endTime: "",
     description: "",
+    status: "Upcoming",
   });
 
   useEffect(() => {
-    dispatch(fetchEvents());
-  }, [dispatch]);
+    if (state) {
+      setForm({
+        title: state.title,
+        date: state.date,
+        startTime: state.startTime,
+        endTime: state.endTime,
+        description: state.description,
+        status: state.status ?? "Upcoming",
+      });
+    } else {
+      setForm({
+        title: "",
+        date: "",
+        startTime: "",
+        endTime: "",
+        description: "",
+        status: "Upcoming",
+      });
+    }
+  }, [state]);
 
   const handleChange =
     (field: keyof FormState) => (e: ChangeEvent<HTMLInputElement>) => {
@@ -53,7 +77,22 @@ export default function AddEvent() {
       status: "Upcoming",
     };
 
-    dispatch(addEvent(newFormEvent));
+    if (state) {
+      const updatedFormEvent: Event = {
+        id: state.id,
+        title: form.title,
+        date: form.date,
+        startTime: form.startTime,
+        endTime: form.endTime,
+        description: form.description,
+        status: form.status,
+      };
+      console.log("Updating Event ID:", updatedFormEvent.id);
+      dispatch(updateEvent(updatedFormEvent));
+    } else {
+      console.log("add api-------");
+      dispatch(addEvent(newFormEvent));
+    }
 
     // Schedule reminder for 5 minutes before event
     const [year, month, day] = form.date.split("-");
@@ -126,6 +165,7 @@ export default function AddEvent() {
       startTime: "",
       endTime: "",
       description: "",
+      status: "Upcoming",
     });
   };
 
@@ -133,7 +173,7 @@ export default function AddEvent() {
     <>
       <Paper elevation={3} sx={{ padding: 4, maxWidth: 600, margin: "0 auto" }}>
         <Typography variant="h5" gutterBottom>
-          Add New Event
+          {state ? "Edit Event" : "Add New Event"}
         </Typography>
 
         <Box component="form" onSubmit={handleSubmit} noValidate>
@@ -202,13 +242,14 @@ export default function AddEvent() {
                     startTime: "",
                     endTime: "",
                     description: "",
+                    status: "Upcoming",
                   })
                 }
               >
                 Reset
               </Button>
               <Button type="submit" variant="contained">
-                Save Event
+                {state ? "Update Event" : "Save Event"}
               </Button>
             </Box>
           </Stack>
